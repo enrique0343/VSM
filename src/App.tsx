@@ -19,10 +19,18 @@ function HomeView() {
   const [newName, setNewName] = useState('');
   const [showCreate, setShowCreate] = useState(false);
   const [error, setError] = useState('');
+  const [isLocal, setIsLocal] = useState(false);
 
   useEffect(() => {
     listMaps()
-      .then(setMaps)
+      .then((m) => {
+        setMaps(m);
+        // Si no hay backend, el API cae a localStorage
+        const hasBackend = fetch('/api/maps', { signal: AbortSignal.timeout(2000) })
+          .then((r) => setIsLocal(!r.ok && r.status !== 200))
+          .catch(() => setIsLocal(true));
+        void hasBackend;
+      })
       .catch(() => setError('No se pudo conectar con el servidor.'))
       .finally(() => setLoading(false));
   }, [setMaps]);
@@ -95,6 +103,15 @@ function HomeView() {
           Crea y gestiona tus Value Stream Maps. Arrastra elementos al canvas para mapear tu flujo de valor.
         </p>
 
+        {isLocal && (
+          <div className="mb-4 px-4 py-2 bg-amber-900/30 border border-amber-700/50 rounded text-xs text-amber-300 flex items-center gap-2">
+            <span>⚠</span>
+            <span>
+              Modo local — los mapas se guardan en este navegador.
+              Para persistencia compartida despliega en Cloudflare Pages con D1.
+            </span>
+          </div>
+        )}
         {error && (
           <div className="mb-4 px-4 py-3 bg-red-900/30 border border-red-700 rounded text-xs text-red-300">
             {error}
