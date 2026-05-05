@@ -1,0 +1,16 @@
+name = "vsm-app"
+pages_build_output_dir = "./dist"
+compatibility_date = "2024-03-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "vsm-db"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+
+[[durable_objects.bindings]]
+name = "VSM_COLLAB"
+class_name = "VSMCollabDO"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["VSMCollabDO"]
